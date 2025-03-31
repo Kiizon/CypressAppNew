@@ -3,7 +3,7 @@ from flask import Flask, render_template, session, redirect, url_for, request
 app = Flask(__name__)
 
 # Secret key for session management
-app.secret_key = 'your_secret_key'
+app.secret_key = 'CYPRESS2025'
 
 # Sample user data (in practice, store this in a database)
 users = {
@@ -38,11 +38,20 @@ def dashboard():
     return render_template('home.html', username=session['username'])
 
 @app.route('/page1')
+
 def page1():
+    # If the user is not logged in, redirect to login
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
     return render_template('page1.html')
 
 @app.route('/page2')
 def page2():
+    # If the user is not logged in, redirect to login
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
     return render_template('page2.html')
 
 @app.route('/logout')
