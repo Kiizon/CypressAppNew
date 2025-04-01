@@ -48,18 +48,11 @@ def add_test_users():
 # Secret key for session management
 app.secret_key = 'CYPRESS2025'
 
-# Sample user data (in practice, store this in a database)
-users = {
-    'user1': 'password123',
-    'user2': 'mypassword'
-}
-
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
         # Check if the username exists and password is correct
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
@@ -103,6 +96,7 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
+#TEST METHODS
 @app.route('/users', methods=['GET'])
 def get_users():
     return index()
