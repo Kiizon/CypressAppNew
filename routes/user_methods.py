@@ -19,9 +19,12 @@ def add_user():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
+        phone = request.form['phone']
+        notifications = request.form['notifications']
+        usertype = request.form['usertype']
 
 
-        new_user = User(username=username, email=email, password=password)
+        new_user = User(username=username, email=email, password=password, phone=phone, notifications=notifications, userype=usertype)
         db.session.add(new_user)
         db.session.commit()
 

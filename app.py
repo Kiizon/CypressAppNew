@@ -49,22 +49,29 @@ def insert_test_reports():
 def add_test_users():
     # List of test users with predefined usernames, emails, and passwords
     test_users = [
-        {'username': 'testuser1', 'email': 'testuser1@example.com', 'password': 'testpassword1'},
-        {'username': 'testuser2', 'email': 'testuser2@example.com', 'password': 'testpassword2'},
-        {'username': 'testuser3', 'email': 'testuser3@example.com', 'password': 'testpassword3'},
-        {'username': 'admin', 'email': 'admin@example.com', 'password': 'adminpassword'}
+        {'username': 'testuser1', 'email': 'testuser1@example.com', 'password': 'testpassword1',
+         'notifications': 1, 'user_type': 1, 'phone': '1234567890'},
+        {'username': 'testuser2', 'email': 'testuser2@example.com', 'password': 'testpassword2',
+         'notifications': 1, 'user_type': 1, 'phone': '2345678901'},
+        {'username': 'testuser3', 'email': 'testuser3@example.com', 'password': 'testpassword3',
+         'notifications': 1, 'user_type': 1, 'phone': '3456789012'},
+        {'username': 'admin', 'email': 'admin@example.com', 'password': 'adminpassword',
+         'notifications': 1, 'user_type': 0, 'phone': '9876543210'}
     ]
     # Loop through test users and add them to the database
     for user_data in test_users:
         username = user_data['username']
         email = user_data['email']
         password = user_data['password']
+        notifications = user_data['notifications']
+        user_type = user_data['user_type']
+        phone = user_data['phone']
 
         # Check if the user already exists in the database
         existing_user = User.query.filter_by(username=username).first()
         if not existing_user:
             hashed_password = generate_password_hash(password)  # Hash the password
-            new_user = User(username=username, email=email, password=hashed_password)
+            new_user = User(username=username, email=email, password=hashed_password, notifications=notifications, usertype=user_type, phone=phone)
             db.session.add(new_user)  # Add the user to the session
             db.session.commit()  # Commit the transaction to the database
             print(f"Added test user: {username}")
