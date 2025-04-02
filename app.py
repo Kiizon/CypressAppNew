@@ -131,5 +131,13 @@ def get_users():
 def get_reports():
     return report_methods.index()
 
+@app.route('/map')
+def map():
+    # If the user is not logged in, redirect to login
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    return render_template('map.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
