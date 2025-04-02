@@ -19,6 +19,7 @@ db.init_app(app)
 # Route to create the database tables
 @app.before_request
 def create_tables():
+    db.drop_all()
     db.create_all()  # Create all tables defined by SQLAlchemy models
     add_test_users()
     insert_test_reports()
