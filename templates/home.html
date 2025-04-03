@@ -69,7 +69,7 @@
             <a href="{{ url_for('map') }}" class="list-group-item list-group-item-action">Map</a>
             <a href="{{ url_for('settings') }}" class="list-group-item list-group-item-action">Settings</a>
             <a href="{{ url_for('subscribe') }}" class="list-group-item list-group-item-action">Subscribe</a>
-        {% if session['user_type'] == 1 %}
+        {% if session['user_type'] == 0 %}
             <!-- Show this section only for admins -->
             <a href="{{ url_for('users') }}" class="list-group-item list-group-item-action">View Users</a>
                     <a href="{{ url_for('logs') }}" class="list-group-item list-group-item-action">View Logs</a>
