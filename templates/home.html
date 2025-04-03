@@ -31,10 +31,25 @@
                         <a class="nav-link {{ 'active' if request.endpoint == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ 'active' if request.endpoint == 'page1' else '' }}" href="{{ url_for('page1') }}">Page 1</a>
+                        <a class="nav-link {{ 'active' if request.endpoint == 'reports' else '' }}" href="{{ url_for('reports') }}">View/Edit Reports</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ 'active' if request.endpoint == 'page2' else '' }}" href="{{ url_for('page2') }}">Page 2</a>
+                        <a class="nav-link {{ 'active' if request.endpoint == 'create_report' else '' }}" href="{{ url_for('create_report') }}">Create Report</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'map' else '' }}" href="{{ url_for('map') }}">Map</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'settings' else '' }}" href="{{ url_for('settings') }}">Settings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'subscribe' else '' }}" href="{{ url_for('subscribe') }}">Subscribe</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'logs' else '' }}" href="{{ url_for('logs') }}">View Logs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'users' else '' }}" href="{{ url_for('users') }}">View Users</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
@@ -49,8 +64,16 @@
         <h2>Welcome, {{ username }}!</h2>
         <h3>Directory of Actions</h3>
         <div class="list-group">
-            <a href="{{ url_for('page1') }}" class="list-group-item list-group-item-action">Go to Page 1</a>
-            <a href="{{ url_for('page2') }}" class="list-group-item list-group-item-action">Go to Page 2</a>
+            <a href="{{ url_for('reports') }}" class="list-group-item list-group-item-action">View/Edit Reports</a>
+            <a href="{{ url_for('create_report') }}" class="list-group-item list-group-item-action">Create Report</a>
+            <a href="{{ url_for('map') }}" class="list-group-item list-group-item-action">Map</a>
+            <a href="{{ url_for('settings') }}" class="list-group-item list-group-item-action">Settings</a>
+            <a href="{{ url_for('subscribe') }}" class="list-group-item list-group-item-action">Subscribe</a>
+        {% if session['user_type'] == 1 %}
+            <!-- Show this section only for admins -->
+            <a href="{{ url_for('users') }}" class="list-group-item list-group-item-action">View Users</a>
+                    <a href="{{ url_for('logs') }}" class="list-group-item list-group-item-action">View Logs</a>
+            {% endif %}
             <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-action">Logout</a>
         </div>
     </div>

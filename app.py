@@ -104,7 +104,8 @@ def login():
 def dashboard():
     # If the user is not logged in, redirect to login
     if 'username' not in session:
-        return redirect(url_for('login'))
+        return render_template('home_guestmode.html')
+
 
     return render_template('home.html', username=session['username'])
 
@@ -141,10 +142,6 @@ def get_reports():
 
 @app.route('/map')
 def map():
-    # If the user is not logged in, redirect to login
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
     return render_template('map.html')
 
 if __name__ == '__main__':
