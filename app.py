@@ -94,6 +94,37 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        phone = request.form.get('phone', '')
+        user_type = 1  # Normal user
+        notifications = 1
+
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            flash('Username already exists. Please choose another one.')
+            return redirect(url_for('login'))
+
+        hashed_password = generate_password_hash(password)
+        new_user = User(
+            username=username,
+            email=email,
+            password=hashed_password,
+            notifications=notifications,
+            usertype=user_type,
+            phone=phone
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Account created successfully! Please log in.')
+        return redirect(url_for('login'))
+
+    return render_template('login.html')  # If you support GET too
+
 @app.route('/set_language/<lang>')
 def set_language(lang):
     session['lang'] = lang  # Save the language selection (e.g., 'en' or 'fr') in the session
@@ -138,7 +169,13 @@ def get_users():
 def get_reports():
     return report_methods.index()
 
+@app.route('/map')
+def map():
+    return render_template('map.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
+
+
 
 

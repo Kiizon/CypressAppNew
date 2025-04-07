@@ -24,6 +24,24 @@ font-family: 'Roboto', sans-serif;
 12. Footer
 ==========================================*/
 
+
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.dark-mode .directory-btn {
+    background-color: #333;
+    color: #fff;
+}
+
+body {
+    background-color: #fff;
+    color: #000;
+}
+
+/* Add similar rules to other elements as needed */
+
 /*-------------------------------------
 		1.General css (Reset code)
 --------------------------------------*/
