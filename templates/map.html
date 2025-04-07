@@ -186,6 +186,7 @@
         const { Map } = await google.maps.importLibrary("maps");
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
         const { InfoWindow } = await google.maps.importLibrary("core");
+        const { Geocoder } = await google.maps.importLibrary("geocoding");
 
         // Initialize map
         map = new Map(document.getElementById("map"), {
@@ -251,7 +252,38 @@
 
             // Explicitly set the map for the marker
             marker.map = map;
+            
+            // get the address from the position
+            const geocoder = new Geocoder();
+            geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+              const address = results[0].formatted_address;
+
+              marker.addListener("click", () => {
+              const content = `
+                <div style="padding: 5x; max-width: 200px;">
+                  <h3 style="margin-top: 0;">${name}</h3>
+                  <p><strong>Category:</strong> ${category}</p>
+                  <p>${address}</p>
+                </div>
+              `;
+              
+              const infoWindow = new google.maps.InfoWindow({
+                content: content
+              });
+              
+              infoWindow.open(map, marker);
+              
+              google.maps.event.addListener(map, "click", function() {
+                infoWindow.close();
+              });
+            });
             reportMarkers.push(marker); 
+            });
+
+ 
+
+            
+           
           });
 
         } catch (error) {
@@ -400,9 +432,41 @@
           map: map
         });
 
-        reportMarkers.push(marker);
+             
+            // get the address from the position
+            const geocoder = new Geocoder();
+            geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+              const address = results[0].formatted_address;
+
+              marker.addListener("click", () => {
+              const content = `
+                <div style="padding: 5px; max-width: 200px;">
+                  <h3 style="margin-top: 0;">${name}</h3>
+                  <p><strong>Category:</strong> ${category}</p>
+                  <p>${address}</p>
+                </div>
+              `;
+              
+              const infoWindow = new google.maps.InfoWindow({
+                content: content
+              });
+              
+              infoWindow.open(map, marker);
+              
+              google.maps.event.addListener(map, "click", function() {
+                infoWindow.close();
+              });
+            });
+            reportMarkers.push(marker); 
+            });
+
+ 
+
+            
+           
+          });
+
       });
-    });
 
 
     </script>
