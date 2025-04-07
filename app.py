@@ -6,6 +6,7 @@ from flask import Flask, render_template, session, redirect, url_for, request, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
 from models.report import Report
+
 from models.subscription import Subscription
 
 from models.user import User
@@ -62,6 +63,10 @@ def add_test_users():
         else:
             print(f"User {username} already exists.")
 
+def before_request():
+
+    session['lang'] = 'en'  # or 'fr', based on user preference
+    session['user_type'] = 0  # or some other user type
 
 def insert_test_reports():
     # Fetch all non-admin users
@@ -114,6 +119,41 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        phone = request.form.get('phone', '')
+        user_type = 1  # Normal user
+        notifications = 1
+
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            flash('Username already exists. Please choose another one.')
+            return redirect(url_for('login'))
+
+        hashed_password = generate_password_hash(password)
+        new_user = User(
+            username=username,
+            email=email,
+            password=hashed_password,
+            notifications=notifications,
+            usertype=user_type,
+            phone=phone
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Account created successfully! Please log in.')
+        return redirect(url_for('login'))
+
+    return render_template('login.html')  # If you support GET too
+
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    session['lang'] = lang  # Save the language selection (e.g., 'en' or 'fr') in the session
+    return redirect(request.referrer)  # Return an empty response (204 = No Content)
 
 @app.route('/dashboard')
 def dashboard():
@@ -286,3 +326,7 @@ app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=sch
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+
