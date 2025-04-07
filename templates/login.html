@@ -34,6 +34,10 @@
                     {% endif %}
                 {% endwith %}
             </form>
+
+            <form method="POST" action="{{ url_for('guest_login') }}" style="margin-top: 1em;">
+        <button type="submit" class="submit" style="background-color: #6c757d;">Sign In as Guest</button>
+    </form>
         </div>
 
         <div class="sub-cont">
