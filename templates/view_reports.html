@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Navbar -->
+    {% include 'navbar.html' %}  <!-- Assuming your navbar is reusable -->
+
+    <!-- Main Container -->
+    <div class="container mt-4">
+        <h2 class="mb-4">All Reports</h2>
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Longitude</th>
+                    <th>Latitude</th>
+                    <th>Category</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                <tr>
+                    <td>{{ report.id }}</td>
+                    <td>{{ report.name }}</td>
+                    <td>{{ report.description }}</td>
+                    <td>{{ report.longitude }}</td>
+                    <td>{{ report.latitude }}</td>
+                    <td>{{ report.category }}</td>
+                    <td>
+                        <a href="" class="btn btn-success btn-sm">Subscribe</a>
+                        <a href="" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this report?');">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

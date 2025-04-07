@@ -1,3 +1,5 @@
+import json
+import random
 from flask import Flask, render_template, session, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
@@ -24,27 +26,6 @@ def create_tables():
     add_test_users()
     insert_test_reports()
 
-def insert_test_reports():
-    # Insert a bunch of test reports
-    test_reports = [
-        {"name": "Test Report 1", "description": "Test description 1", "longitude": 40.7128, "latitude": -74.0060, "category": "Incident"},
-        {"name": "Test Report 2", "description": "Test description 2", "longitude": 34.0522, "latitude": -118.2437, "category": "Crime"},
-        {"name": "Test Report 3", "description": "Test description 3", "longitude": 51.5074, "latitude": -0.1278, "category": "Accident"},
-        {"name": "Test Report 4", "description": "Test description 4", "longitude": 48.8566, "latitude": 2.3522, "category": "Fire"}
-    ]
-
-    # Insert the test reports into the database
-    for report in test_reports:
-        new_report = Report(
-            name=report["name"],
-            description=report["description"],
-            longitude=report["longitude"],
-            latitude=report["latitude"],
-            category=report["category"]
-        )
-        db.session.add(new_report)
-
-    db.session.commit()  # Commit the changes to the database
 
 def add_test_users():
     # List of test users with predefined usernames, emails, and passwords
@@ -78,6 +59,38 @@ def add_test_users():
         else:
             print(f"User {username} already exists.")
 
+
+def insert_test_reports():
+    # Fetch all non-admin users
+    users = User.query.filter_by(usertype=1).all()
+
+    if not users:
+        print("No non-admin users found. Please add users first.")
+        return
+
+    # Test reports to insert
+    test_reports = [
+        {"name": "Test Report 1", "description": "Test description 1", "longitude": 40.7128, "latitude": -74.0060, "category": "Incident"},
+        {"name": "Test Report 2", "description": "Test description 2", "longitude": 34.0522, "latitude": -118.2437, "category": "Crime"},
+        {"name": "Test Report 3", "description": "Test description 3", "longitude": 51.5074, "latitude": -0.1278, "category": "Accident"},
+        {"name": "Test Report 4", "description": "Test description 4", "longitude": 48.8566, "latitude": 2.3522, "category": "Fire"}
+    ]
+
+    # Insert reports with random user assignment
+    for report in test_reports:
+        assigned_user = random.choice(users)  # Pick a random non-admin user
+        new_report = Report(
+            name=report["name"],
+            description=report["description"],
+            longitude=report["longitude"],
+            latitude=report["latitude"],
+            category=report["category"],
+            user_id=assigned_user.id
+        )
+        db.session.add(new_report)
+
+    db.session.commit()
+    print("Test reports inserted with random user assignments.")
 
 # Secret key for session management
 app.secret_key = 'CYPRESS2025'
@@ -137,12 +150,30 @@ def get_users():
     return user_methods.index()
 
 @app.route('/reports', methods=['GET'])
-def get_reports():
-    return report_methods.index()
+def reports():
+    reports = Report.query.all()
+
+    return render_template('view_reports.html', reports=reports)
 
 @app.route('/map')
 def map():
     return render_template('map.html')
+
+@app.route('/create_report')
+def create_report():
+    return render_template('placeholder.html', page_title='CR')
+
+@app.route('/settings')
+def settings():
+    return render_template('placeholder.html', page_title='Settings')
+
+@app.route('/subscribe')
+def subscribe():
+    return render_template('placeholder.html', page_title='Subscribe')
+
+@app.route('/logs')
+def logs():
+    return render_template('placeholder.html', page_title='View Logs')
 
 if __name__ == '__main__':
     app.run(debug=True)

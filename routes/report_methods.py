@@ -26,7 +26,8 @@ def insert_report():
         description=data['description'],
         longitude=data.get('longitude'),
         latitude=data.get('latitude'),
-        category=data.get('category')
+        category=data.get('category'),
+        user_id=data.get('user_id')
     )
 
     # Add the new report to the database
