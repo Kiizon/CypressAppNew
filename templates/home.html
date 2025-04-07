@@ -124,22 +124,19 @@
 									<a class="nav-link {{ 'active' if request.endpoint == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}">Home</a>
 								  </li>								  
 								  <li class="nav-item">
-									<a class="nav-link {{ 'active' if request.endpoint == 'reports' else '' }}" href="{{ url_for('get_reports') }}">View/Edit Reports</a>
+									<a class="nav-link {{ 'active' if request.endpoint == 'reports' else '' }}" href="{{ url_for('reports') }}">View/Edit Reports</a>
 								</li>
 			                    <li class="nav-item">
-									<a class="nav-link {{ 'active' if request.endpoint == 'create_report' else '' }}" href="{{ url_for('get_reports') }}">Create Report</a>
+									<a class="nav-link {{ 'active' if request.endpoint == 'create_report' else '' }}" href="{{ url_for('create_report') }}">Create Report</a>
 								</li>
 								<li class="nav-item">
 									<a class="nav-link {{ 'active' if request.endpoint == 'map' else '' }}" href="{{ url_for('map') }}">Map</a>
 								</li>
 								<li class="nav-item">
-									<a class="nav-link {{ 'active' if request.endpoint == 'settings' else '' }}" href="{{ url_for('get_reports') }}">Settings</a>
+									<a class="nav-link {{ 'active' if request.endpoint == 'settings' else '' }}" href="{{ url_for('settings') }}">Settings</a>
 								</li>
 								<li class="nav-item">
-									<a class="nav-link {{ 'active' if request.endpoint == 'subscribe' else '' }}" href="{{ url_for('get_reports') }}">Subscribe</a>
-								</li>
-								<li class="nav-item">
-									<a class="nav-link {{ 'active' if request.endpoint == 'logs' else '' }}" href="{{ url_for('get_reports') }}">View Logs</a>
+									<a class="nav-link {{ 'active' if request.endpoint == 'logs' else '' }}" href="{{ url_for('logs') }}">View Logs</a>
 								</li>
 								<li class="nav-item">
 									<a class="nav-link {{ 'active' if request.endpoint == 'users' else '' }}" href="{{ url_for('get_users') }}">View Users</a>
@@ -173,13 +170,12 @@
 
 
 					<div class="button-box">
-						<a href="{{ url_for('get_reports') }}" class="directory-btn">View/Edit Reports</a>
-						<a href="{{ url_for('get_reports') }}" class="directory-btn">Create Report</a>
+						<a href="{{ url_for('reports') }}" class="directory-btn">View/Edit Reports</a>
+						<a href="{{ url_for('create_report') }}" class="directory-btn">Create Report</a>
 						<a href="{{ url_for('map') }}" class="directory-btn">Map</a>
-						<a href="{{ url_for('get_reports') }}" class="directory-btn">Setting</a>
-						<a href="{{ url_for('get_reports') }}" class="directory-btn">Subscribe</a>
+						<a href="{{ url_for('settings') }}" class="directory-btn">Setting</a>
 					{% if session['user_type'] == 0 %}
-						<a href="{{ url_for('get_reports') }}" class="directory-btn">View Logs</a>
+						<a href="{{ url_for('logs') }}" class="directory-btn">View Logs</a>
 						<a href="{{ url_for('get_users') }}" class="directory-btn">View Users</a>
 						{% endif %}
 						<a href="{{ url_for('logout') }}" class="directory-btn">Logout</a>
