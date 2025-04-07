@@ -162,7 +162,8 @@ def reports():
 
 @app.route('/map')
 def map():
-    return render_template('map.html')
+    reportsAll = Report.query.all()  # Admin sees all reports
+    return render_template('map.html', reports=reportsAll)
 
 @app.route('/create_report')
 def create_report():
