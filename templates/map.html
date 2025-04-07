@@ -3,24 +3,146 @@
   <head>
     <title>Add Map</title>
     <style>
-      #map {
-        height: 100%;
-        width: 60%;
+      :root {
+          --background:  #f2f2f2;
+          --color: #ffffff;
+          --primary-color: #0f3460;
       }
 
-      html,
+      * {
+          box-sizing: border-box;
+      }
+
+      html {
+          scroll-behavior: smooth;
+      }
+
       body {
+          margin: 50px;
+          font-family: "poppins";
+          background: var(--background);
+          color: var(--color);
+          letter-spacing: 1px;
+          transition: background 0.2s ease;
+      }
+      .inline-container {
+        display: flex;
+        gap: 1rem
+      }
+      .map-container {
+        color: red;
+        display: inline-block;
+        width: 70%; 
+        height: 1000px; 
+        margin-left: 25px;
+        border: 2px solid var(--primary-color);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        vertical-align: top;
+      }
+      .controls-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+      }
+
+      .location-search {
+        width: 100%;
+        padding: 10px; 
+        font-size: 16px; 
+        border-radius: 10px;
+      }
+
+      #map {
+        width: 100%;
         height: 100%;
-        margin: 0;
-        padding: 0;
+      }
+      #report-button {
+        width: 10em;
+        position: relative;
+        height: 3.5em;
+        border: 3px ridge red;
+        outline: none;
+        background-color: transparent;
+        color: var(--primary-color);
+        transition: 1s;
+        border-radius: 0.3em;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      #report-button::after {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: 3%;
+        width: 95%;
+        height: 40%;
+        background-color:  #f2f2f2;
+        transition: 0.5s;
+        transform-origin: center;
+      }
+
+      #report-button::before {
+        content: "";
+        transform-origin: center;
+        position: absolute;
+        top: 80%;
+        left: 3%;
+        width: 95%;
+        height: 40%;
+        background-color:  #f2f2f2;
+        transition: 0.5s;
+      }
+
+      #report-button:hover::before, button:hover::after {
+        transform: scale(0)
+      }
+
+      #report-button:hover {
+        box-shadow: inset 0px 0px 25px red;
+      }
+      #category-dropdown {
+        width: 100%;
+        margin-top: 10px;
+        padding: 10px; 
+        font-size: 16px; 
+        border-radius: 10px;
       }
     </style>
   </head>
   <body>
-    <h3>Cypress Map Demo</h3>
-    <div id="map"></div>
+    <h3 style="text-align: center; color: #0f3460">Cypress Map</h3>
 
-    <!-- Google Maps API loader -->
+    <div class="inline-container">
+
+      <div class="map-container">
+        <div id="map"></div>
+      </div>
+
+      <div class="controls-container">
+        <input class="location-search"
+          is="gmp-placeautocomplete"
+          id="location-input"
+          placeholder="Search location" />
+        <div class="report-box">
+          <button id="report-button" onclick="alert('button is supposed to go to add reports page')">Alert Your Community</button>
+          <select id="category-dropdown">
+            <option value="" disabled selected>Filter reports by Category</option>
+            <option value="All">View All</option>
+            <option value="Incident">Incident</option>
+            <option value="Fire">Fire</option>
+            <option value="Crime">Crime</option>
+            <option value="Accident">Accident</option>
+          </select>
+        </div>
+        
+      </div>
+    </div>
+
     <script>
       (g => {
         var h, a, k, p = "The Google Maps JavaScript API",
@@ -38,7 +160,10 @@
             e.set("libraries", [...r] + "");
             for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
             e.set("callback", c + ".maps." + q);
+            e.set("libraries", "places");
+            e.set("callback", c + ".maps." + q);
             a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+
             d[q] = f;
             a.onerror = () => h = n(Error(p + " could not load."));
             a.nonce = m.querySelector("script[nonce]")?.nonce || "";
@@ -51,95 +176,235 @@
       });
     </script>
 
-    <!-- App Script -->
     <script type="module">
       let map, userMarker;
+      //array that holds all the reported events
+      let reportMarkers = []; 
 
       async function initMap() {
         const defaultPosition = { lat: 43.65786971218538, lng: -79.37921444568586 };
         const { Map } = await google.maps.importLibrary("maps");
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+        const { InfoWindow } = await google.maps.importLibrary("core");
 
+        // Initialize map
         map = new Map(document.getElementById("map"), {
           zoom: 16,
           center: defaultPosition,
-          mapId: "DEMO_MAP_ID",
+          mapId: "string",
+          disableDefaultUI: false,
         });
+        
+        const userIcon = document.createElement("img");
+        userIcon.src = "https://cdn3.iconfinder.com/data/icons/maps-and-navigation-flat-vol-3/150/user__map__location__marker-512.png";
+        userIcon.style.width = "60px";
+        userIcon.style.height = "60px";
 
+        // Create user marker
         userMarker = new AdvancedMarkerElement({
           map,
           position: defaultPosition,
           title: "Your Location",
+          content: userIcon
         });
 
-        if (navigator.geolocation) {
-          // Initial location fetch
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const userPos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              };
-              map.panTo(userPos);
-              userMarker.position = userPos;
-            },
-            (error) => {
-              console.error("Error getting current position:", error);
-            }
-          );
+         // Fetch and add report markers
+        try {
+          const response = await fetch('/map_reports');
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          console.log('Fetched reports:', data);
 
-          // Watch for location user changes
-          navigator.geolocation.watchPosition(
-            (position) => {
-              const updatedPos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              };
-              map.panTo(updatedPos);
-              userMarker.position = updatedPos;
-              userMarker.title = "Updated Location";
-            },
-            (error) => {
-              console.error("Error watching position:", error);
-            },
-            {
-              enableHighAccuracy: true,
-              maximumAge: 0,
-              timeout: 10000
+          
+          if (!Array.isArray(data)) {
+            console.error('Reports data is not an array:', data);
+            return;
+          }
+
+          data.forEach((report, index) => {
+            const { category, description, id, latitude, longitude, name } = report;
+            const reportIcon = document.createElement("img");
+            reportIcon.src = "https://cdn2.iconfinder.com/data/icons/location-174/64/alert_emergency_location_map_point_pin-512.png";
+            reportIcon.style.width = "40px";
+            reportIcon.style.height = "40px";
+            if (!latitude || !longitude) {
+              console.warn(`Report ${index} missing coordinates:`, report);
+              return;
             }
-          );
-        } else {
-          console.error("Geolocation is not supported by this browser.");
+
+            const lat = Number(latitude);
+            const lng = Number(longitude);
+
+            if (isNaN(lat) || isNaN(lng)) {
+              console.warn(`Invalid coordinates for ${name}:`, latitude, longitude);
+              return;
+            }
+
+            const marker = new AdvancedMarkerElement({
+              position: { lat, lng },
+              title: name || 'Unnamed Location',
+              content: reportIcon
+            });
+
+            // Explicitly set the map for the marker
+            marker.map = map;
+            reportMarkers.push(marker); 
+          });
+
+        } catch (error) {
+          console.error('Error fetching reports:', error);
         }
 
-        // add markers to map
-        fetch('/reports')
-          .then(response => response.json())
-          .then(data => {
-            console.log(data); // Log the data to verify its structure
-            data.forEach(report => {
-              const { latitude, longitude, name, description } = report;
+        // Check for geolocation support
+        if (!navigator.geolocation) {
+          console.error("Geolocation is not supported by this browser.");
+          return;
+        }
 
-              const marker = new AdvancedMarkerElement({
-                map,
-                position: { lat: latitude, lng: longitude },
-                title: name,
-              });
+        // Watch position options
+        const watchOptions = {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 15000,
+        };
 
-              const infoWindow = new google.maps.InfoWindow({
-                content: `<b>${name}</b><br>${description}`,
-              });
+        // Function to update user position
+        function updatePosition(position) {
+          const newPos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          map.panTo(newPos);
+          userMarker.position = newPos;
+          userMarker.title = `Location (Accuracy: ${Math.round(position.coords.accuracy)}m)`;
+        }
 
-              marker.addEventListener('gmp-click', () => {
-                infoWindow.open(map, marker);
-              });
-            });
-          })
-  .catch(error => console.error('Error fetching reports:', error));
+        // Error handler
+        function handleError(error) {
+          let message;
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              message = "User denied geolocation access";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              message = "Location information unavailable";
+              break;
+            case error.TIMEOUT:
+              message = "Location request timed out";
+              break;
+            default:
+              message = "Unknown error occurred";
+          }
+          console.error("Geolocation error:", message);
+        }
 
+        // Start watching position
+        navigator.geolocation.watchPosition(
+          updatePosition,
+          handleError,
+          watchOptions
+        );
+
+        // Get initial position
+        navigator.geolocation.getCurrentPosition(
+          updatePosition,
+          handleError,
+          watchOptions
+        );
       }
+      // Auto complete for location search box
+      function initAutocomplete() {
+      const input = document.getElementById("location-input");
+      const autocomplete = new google.maps.places.Autocomplete(input);
 
-      initMap();
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        if (!place.geometry || !place.geometry.location) {
+          alert("No details available for input: '" + place.name + "'");
+          return;
+        }
+
+        const location = place.geometry.location;
+        const latLng = {
+          lat: location.lat(),
+          lng: location.lng()
+        };
+
+        map.panTo(latLng);
+        map.setZoom(16);
+
+      });
+    }
+
+    // Initialize the map
+    initMap()
+    .then(() => initAutocomplete())
+    .catch(error => console.error("Map initialization failed:", error));
+
+    // Uses the GraphQL filtering system from App.py
+    document.getElementById("category-dropdown").addEventListener("change", async function () {
+      const selectedCategory = this.value;
+
+      const graphqlQuery = {
+        query: `
+          query($cat: String) {
+            reports(category: $cat) {
+              name
+              latitude
+              longitude
+              description
+              category
+            }
+          }
+        `,
+        variables: {
+          cat: selectedCategory || null
+        }
+      };
+
+      const response = await fetch("/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(graphqlQuery)
+      });
+
+      const result = await response.json();
+      const data = result.data.reports;
+
+      //Clear existing markers
+      reportMarkers.forEach(marker => marker.map = null);
+      reportMarkers = [];
+
+      //Add new filtered markers
+      data.forEach((report, index) => {
+        const { category, description, latitude, longitude, name } = report;
+        const reportIcon = document.createElement("img");
+        reportIcon.src = "https://cdn2.iconfinder.com/data/icons/location-174/64/alert_emergency_location_map_point_pin-512.png";
+        reportIcon.style.width = "40px";
+        reportIcon.style.height = "40px";
+
+        if (!latitude || !longitude) return;
+        const lat = Number(latitude);
+        const lng = Number(longitude);
+        if (isNaN(lat) || isNaN(lng)) return;
+
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+          position: { lat, lng },
+          title: name || "Unnamed Location",
+          content: reportIcon,
+          map: map
+        });
+
+        reportMarkers.push(marker);
+      });
+    });
+
+
     </script>
   </body>
 </html>
