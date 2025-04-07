@@ -4,6 +4,7 @@ from flask import Flask, render_template, session, redirect, url_for, request, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
 from models.report import Report
+from models.subscription import Subscription
 
 from models.user import User
 from routes import user_methods
@@ -171,10 +172,6 @@ def create_report():
 def settings():
     return render_template('placeholder.html', page_title='Settings')
 
-@app.route('/subscribe')
-def subscribe():
-    return render_template('placeholder.html', page_title='Subscribe')
-
 @app.route('/logs')
 def logs():
     return render_template('placeholder.html', page_title='View Logs')
@@ -200,6 +197,57 @@ def edit_report(report_id):
 
     else:
         return redirect(url_for('reports'))
+
+@app.route('/confirm_delete/<int:report_id>', methods=['GET'])
+def confirm_delete(report_id):
+    report = Report.query.get(report_id)  # Find the report by ID
+    if not report:
+        flash('Report not found.', 'danger')
+        return redirect(url_for('view_reports'))  # Redirect back if report not found
+    return render_template('confirm_delete.html', report=report)
+
+
+@app.route('/delete_report/<int:report_id>', methods=['GET'])
+def delete_report(report_id):
+    report = Report.query.get(report_id)  # Find the report by ID
+    if report:
+        db.session.delete(report)  # Delete the report
+        db.session.commit()  # Commit the change to the database
+        flash('Report deleted successfully.', 'success')  # Success message
+    else:
+        flash('Report not found.', 'danger')  # Handle case if the report doesn't exist
+    return redirect(url_for('reports'))  # Redirect back to the list of reports
+
+
+@app.route('/subscribe/<int:report_id>', methods=['GET'])
+def subscribe_screen(report_id):
+    # Fetch the specific report based on the report_id
+    report = Report.query.get_or_404(report_id)
+
+    # Check if the user is already subscribed to this report
+    subscription = Subscription.query.filter_by(user_id=session.get('user_id'), report_id=report_id).first()
+
+    # If subscribed, set the flag
+    is_subscribed = subscription is not None
+
+    return render_template('subscribe.html', report=report, is_subscribed=is_subscribed)
+
+@app.route('/subscribe/<int:report_id>/subscribe', methods=['GET'])
+def subscribe(report_id):
+    # Check if the user is already subscribed to this report
+    subscription = Subscription.query.filter_by(user_id=session.get('user_id'), report_id=report_id).first()
+
+    if subscription:
+        flash("You are already subscribed to this report.", 'warning')
+        return redirect(url_for('subscribe_screen', report_id=report_id))
+
+    # Add the subscription if not already subscribed
+    new_subscription = Subscription(user_id=session.get('user_id'), report_id=report_id)
+    db.session.add(new_subscription)
+    db.session.commit()
+
+    flash("You have successfully subscribed to this report.", 'success')
+    return redirect(url_for('subscribe_screen', report_id=report_id))
 
 if __name__ == '__main__':
     app.run(debug=True)

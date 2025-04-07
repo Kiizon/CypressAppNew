@@ -1,0 +1,10 @@
+<div class="container mt-5">
+    <h2>Are you sure you want to delete this report?</h2>
+
+    <p><strong>{{ report.name }}</strong></p>
+    <p>{{ report.description }}</p>
+
+    <!-- Confirmation Buttons -->
+    <a href="{{ url_for('delete_report', report_id=report.id) }}" class="btn btn-danger">Yes, Delete</a>
+    <a href="{{ url_for('reports') }}" class="btn btn-secondary">No, Cancel</a>
+</div>
