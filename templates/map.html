@@ -437,7 +437,7 @@
             const geocoder = new Geocoder();
             geocoder.geocode({ location: { lat, lng } }, (results, status) => {
               const address = results[0].formatted_address;
-
+              //popups for the filtering systems
               marker.addListener("click", () => {
               const content = `
                 <div style="padding: 5px; max-width: 200px;">
