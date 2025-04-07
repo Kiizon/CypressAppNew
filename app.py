@@ -60,6 +60,12 @@ def add_test_users():
         else:
             print(f"User {username} already exists.")
 
+@app.before_request
+def create_tables():
+    db.drop_all()
+    db.create_all()  # Create all tables defined by SQLAlchemy models
+    add_test_users()
+    insert_test_reports()
 
 def insert_test_reports():
     # Fetch all non-admin users
@@ -71,10 +77,56 @@ def insert_test_reports():
 
     # Test reports to insert
     test_reports = [
-        {"name": "Test Report 1", "description": "Test description 1", "longitude": 40.7128, "latitude": -74.0060, "category": "Incident"},
-        {"name": "Test Report 2", "description": "Test description 2", "longitude": 34.0522, "latitude": -118.2437, "category": "Crime"},
-        {"name": "Test Report 3", "description": "Test description 3", "longitude": 51.5074, "latitude": -0.1278, "category": "Accident"},
-        {"name": "Test Report 4", "description": "Test description 4", "longitude": 48.8566, "latitude": 2.3522, "category": "Fire"}
+        {"name": "Test Report 1", "description": "Test description 1", "latitude": 43.65457013324826, "longitude": -79.38077450452194, "category": "Incident"},
+        {"name": "Test Report 2", "description": "Test description 2", "latitude": 43.6580165713743, "longitude": -79.38048482588174, "category": "Crime"},
+        {"name": "Test Report 3", "description": "Test description 3", "latitude": 43.66004242578571, "longitude": -79.37972307851004, "category": "Accident"},
+        {"name": "Test Report 4", "description": "Test description 4", "latitude": 43.657869092737954, "longitude": -79.37824249923946, "category": "Fire"},
+        {"name": "Test Report 5", "description": "Test description 5", "latitude": 43.66136259947873, "longitude": -79.38333591925759, "category": "Fire"},
+        {"name": "Test Report 6", "description": "Test description 6", "latitude": 43.66767544146261, "longitude": -79.38292014575401, "category": "Accident"},
+        {"name": "Test Report 7", "description": "Test description 7", "latitude": 43.66854464216485, "longitude": -79.391267179834, "category": "Incident"},
+        {"name": "Test Report 8", "description": "Test description 8", "latitude": 43.64056114119252, "longitude": -79.40079318339204, "category": "Incident"},
+        {"name": "Test Report 9", "description": "Test description 9", "latitude": 43.64686758906263, "longitude": -79.36930262096327, "category": "Crime"},
+        {"name": "Test Report 10", "description": "Test description 10", "latitude": 43.650123, "longitude": -79.377456, "category": "Fire"},
+        {"name": "Test Report 11", "description": "Test description 11", "latitude": 43.652789, "longitude": -79.386543, "category": "Accident"},
+        {"name": "Test Report 12", "description": "Test description 12", "latitude": 43.655321, "longitude": -79.390678, "category": "Incident"},
+        {"name": "Test Report 13", "description": "Test description 13", "latitude": 43.659876, "longitude": -79.374112, "category": "Crime"},
+        {"name": "Test Report 14", "description": "Test description 14", "latitude": 43.664234, "longitude": -79.384321, "category": "Fire"},
+        {"name": "Test Report 15", "description": "Test description 15", "latitude": 43.662543, "longitude": -79.379432, "category": "Accident"},
+        {"name": "Test Report 16", "description": "Test description 16", "latitude": 43.669001, "longitude": -79.371234, "category": "Crime"},
+        {"name": "Test Report 17", "description": "Test description 17", "latitude": 43.670456, "longitude": -79.390321, "category": "Incident"},
+        {"name": "Test Report 18", "description": "Test description 18", "latitude": 43.671890, "longitude": -79.375678, "category": "Fire"},
+        {"name": "Test Report 19", "description": "Test description 19", "latitude": 43.673210, "longitude": -79.389012, "category": "Accident"},
+        {"name": "Test Report 20", "description": "Test description 20", "latitude": 49.282729, "longitude": -123.120738, "category": "Incident"},
+        {"name": "Test Report 21", "description": "Test description 21", "latitude": 49.276790, "longitude": -123.130680, "category": "Crime"},
+        {"name": "Test Report 22", "description": "Test description 22", "latitude": 49.270877, "longitude": -123.115431, "category": "Accident"},
+        {"name": "Test Report 23", "description": "Test description 23", "latitude": 49.263611, "longitude": -123.138611, "category": "Fire"},
+        {"name": "Test Report 24", "description": "Test description 24", "latitude": 49.289347, "longitude": -123.123907, "category": "Fire"},
+        {"name": "Test Report 25", "description": "Test description 25", "latitude": 49.261821, "longitude": -123.113175, "category": "Crime"},
+        {"name": "Test Report 26", "description": "Test description 26", "latitude": 49.280075, "longitude": -123.104755, "category": "Incident"},
+        {"name": "Test Report 27", "description": "Test description 27", "latitude": 49.268244, "longitude": -123.152498, "category": "Accident"},
+        {"name": "Test Report 28", "description": "Test description 28", "latitude": 49.284401, "longitude": -123.121659, "category": "Fire"},
+        {"name": "Test Report 29", "description": "Test description 29", "latitude": 49.277498, "longitude": -123.133181, "category": "Incident"},
+        # Montreal, QC
+        {"name": "Test Report 30", "description": "Test description 30", "latitude": 45.501689, "longitude": -73.567256, "category": "Incident"},
+        {"name": "Test Report 31", "description": "Test description 31", "latitude": 45.508840, "longitude": -73.554123, "category": "Crime"},
+        {"name": "Test Report 32", "description": "Test description 32", "latitude": 45.495321, "longitude": -73.578901, "category": "Accident"},
+        {"name": "Test Report 33", "description": "Test description 33", "latitude": 45.512345, "longitude": -73.560789, "category": "Fire"},
+        # Calgary, AB
+        {"name": "Test Report 34", "description": "Test description 34", "latitude": 51.044733, "longitude": -114.071883, "category": "Incident"},
+        {"name": "Test Report 35", "description": "Test description 35", "latitude": 51.038912, "longitude": -114.065432, "category": "Crime"},
+        {"name": "Test Report 36", "description": "Test description 36", "latitude": 51.050123, "longitude": -114.080567, "category": "Accident"},
+        # Halifax, NS
+        {"name": "Test Report 37", "description": "Test description 37", "latitude": 44.648862, "longitude": -63.575320, "category": "Fire"},
+        {"name": "Test Report 38", "description": "Test description 38", "latitude": 44.642345, "longitude": -63.580123, "category": "Incident"},
+        {"name": "Test Report 39", "description": "Test description 39", "latitude": 44.655678, "longitude": -63.570987, "category": "Crime"},
+        # Winnipeg, MB
+        {"name": "Test Report 40", "description": "Test description 40", "latitude": 49.895136, "longitude": -97.138374, "category": "Accident"},
+        {"name": "Test Report 41", "description": "Test description 41", "latitude": 49.887654, "longitude": -97.145678, "category": "Fire"},
+        # Ottawa, ON
+        {"name": "Test Report 42", "description": "Test description 42", "latitude": 45.421530, "longitude": -75.697193, "category": "Incident"},
+        {"name": "Test Report 43", "description": "Test description 43", "latitude": 45.415678, "longitude": -75.690123, "category": "Crime"},
+        # Edmonton, AB
+        {"name": "Test Report 44", "description": "Test description 44", "latitude": 53.544389, "longitude": -113.490927, "category": "Accident"},
     ]
 
     # Insert reports with random user assignment
@@ -162,7 +214,7 @@ def reports():
 
 @app.route('/map_reports')
 def rep():
-    return Report.index()  # Admin sees all reports
+    return report_methods.index()  # Admin sees all reports
 
 @app.route('/map')
 def map():
