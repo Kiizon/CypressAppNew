@@ -10,6 +10,9 @@ from models.user import User
 from routes import user_methods
 from routes import report_methods
 
+from graphql_server.flask import GraphQLView
+import graphene
+
 app = Flask(__name__)
 
 # Configure the SQLite database URI
@@ -317,6 +320,42 @@ def unsubscribe(report_id):
         flash("You're not subscribed to this report.")
 
     return redirect(url_for('subscribe_view', report_id=report_id))
+# # map filtering using GraphQL
+
+# GraphQL object Type
+class ReportType(graphene.ObjectType):
+    name = graphene.String()
+    description = graphene.String()
+    latitude = graphene.Float()  # Changed from Int to Float since your coordinates are decimals
+    longitude = graphene.Float()  # Changed from Int to Float since your coordinates are decimals
+    category = graphene.String()
+
+
+# the filteringSystem
+
+class Query(graphene.ObjectType):
+    reports = graphene.List(ReportType, category=graphene.String())
+
+    def resolve_reports(self, info, category=None):
+        print("GraphQL received category:", category)
+        if category == "Incident":
+            return Report.query.filter(Report.category == "Incident").all()
+        elif category == "Fire":
+            return Report.query.filter(Report.category == "Fire").all()
+        elif category == "Accident":
+            return Report.query.filter(Report.category == "Accident").all()
+        elif category == "Crime":
+            return Report.query.filter(Report.category == "Crime").all()
+        elif category == "All":
+            return Report.query.all()
+        else:
+            return Report.query.all()
+
+# Create the GraphQL schema
+schema = graphene.Schema(query=Query)
+
+# Add GraphQL endpoint to Flask app
+app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True))
 
 if __name__ == '__main__':
     app.run(debug=True)
