@@ -160,10 +160,13 @@ def reports():
 
     return render_template('view_reports.html', user_type=user_type, reports=reports, reportsAll=reportsAll)
 
+@app.route('/map_reports')
+def rep():
+    return Report.index()  # Admin sees all reports
+
 @app.route('/map')
 def map():
-    reportsAll = Report.query.all()  # Admin sees all reports
-    return render_template('map.html', reports=reportsAll)
+    return render_template('map.html')
 
 @app.route('/create_report')
 def create_report():

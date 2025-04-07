@@ -210,7 +210,7 @@
 
          // Fetch and add report markers
         try {
-          const response = await fetch('/reports');
+          const response = await fetch('/map_reports');
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
