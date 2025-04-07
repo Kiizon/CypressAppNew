@@ -34,12 +34,50 @@
 }/*max-width:992px*/
 
 @media screen and (max-width:991px){
+	
+	
 	.welcome-hero-serch-box {display: flex; flex-direction: column;align-items: center;}
 	.welcome-hero-btn {margin-top: 30px;}
 	.welcome-hero-form {width: 100%;}
 	.explore-price-box {padding: 0 5px;margin: 0 5px;}
 	.footer-menu ul.footer-menu-item li a {padding-left: 15px;}
 }/*max-width:991px*/
+
+.button-box {
+	margin-top: 25px;
+	padding: 20px;
+	background: #f9f9f9;
+	border-radius: 15px;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+	display: flex;
+	gap: 15px;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.directory-btn {
+	padding: 12px 24px;
+	font-size: 15px;
+	color: #000000;
+	border: none;
+	border-radius: 30px;
+	text-decoration: none;
+	transition: all 0.3s ease-in-out;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	text-align: center;
+	min-width: 140px;
+}
+
+/* Red gradient button */
+.red-btn {
+	background: linear-gradient(135deg, #ff5f6d, #ff3c3c);
+}
+
+.red-btn:hover {
+	background: linear-gradient(135deg, #e53935, #d32f2f);
+	transform: translateY(-2px);
+	box-shadow: 0 6px 18px rgba(255, 60, 60, 0.4);
+}
 
 @media screen and (max-width:768px){
     

@@ -2,7 +2,6 @@ from flask import Flask, render_template, session, redirect, url_for, request, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
 from models.report import Report
-
 from models.user import User
 from routes import user_methods
 from routes import report_methods
@@ -70,6 +69,10 @@ def add_test_users():
         else:
             print(f"User {username} already exists.")
 
+def before_request():
+
+    session['lang'] = 'en'  # or 'fr', based on user preference
+    session['user_type'] = 0  # or some other user type
 
 # Secret key for session management
 app.secret_key = 'CYPRESS2025'
@@ -91,6 +94,10 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    session['lang'] = lang  # Save the language selection (e.g., 'en' or 'fr') in the session
+    return redirect(request.referrer)  # Return an empty response (204 = No Content)
 
 @app.route('/dashboard')
 def dashboard():
@@ -133,3 +140,5 @@ def get_reports():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
