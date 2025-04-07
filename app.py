@@ -1,6 +1,6 @@
 import json
 import random
-from flask import Flask, render_template, session, redirect, url_for, request, flash
+from flask import Flask, render_template, session, redirect, url_for, request, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
 from models.report import Report
@@ -86,7 +86,8 @@ def insert_test_reports():
             longitude=report["longitude"],
             latitude=report["latitude"],
             category=report["category"],
-            user_id=assigned_user.id
+            user_id=assigned_user.id,
+            last_updated=None
         )
         db.session.add(new_report)
 
@@ -95,6 +96,8 @@ def insert_test_reports():
 
 # Secret key for session management
 app.secret_key = 'CYPRESS2025'
+
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -162,7 +165,7 @@ def reports():
 
 @app.route('/map_reports')
 def rep():
-    return Report.index()  # Admin sees all reports
+    return report_methods.index()  # Admin sees all reports
 
 @app.route('/map')
 def map():
@@ -224,34 +227,44 @@ def delete_report(report_id):
 
 
 @app.route('/subscribe/<int:report_id>', methods=['GET'])
-def subscribe_screen(report_id):
-    # Fetch the specific report based on the report_id
+def subscribe_view(report_id):
+    user_id = session.get('user_id')
     report = Report.query.get_or_404(report_id)
 
-    # Check if the user is already subscribed to this report
-    subscription = Subscription.query.filter_by(user_id=session.get('user_id'), report_id=report_id).first()
-
-    # If subscribed, set the flag
+    # Check if subscription exists
+    subscription = Subscription.query.filter_by(user_id=user_id, report_id=report_id).first()
     is_subscribed = subscription is not None
 
-    return render_template('subscribe.html', report=report, is_subscribed=is_subscribed)
+    return render_template('subscribe_view.html', report=report, is_subscribed=is_subscribed)
 
-@app.route('/subscribe/<int:report_id>/subscribe', methods=['GET'])
-def subscribe(report_id):
-    # Check if the user is already subscribed to this report
-    subscription = Subscription.query.filter_by(user_id=session.get('user_id'), report_id=report_id).first()
+@app.route('/subscribe/<int:report_id>', methods=['POST'])
+def subscribe_to_report(report_id):
+    user_id = session.get('user_id')
+    existing = Subscription.query.filter_by(user_id=user_id, report_id=report_id).first()
+
+    if existing:
+        flash("You're already subscribed.")
+    else:
+        new_sub = Subscription(user_id=user_id, report_id=report_id)
+        db.session.add(new_sub)
+        db.session.commit()
+        flash("Subscribed successfully!")
+
+    return redirect(url_for('subscribe_view', report_id=report_id))
+
+@app.route('/unsubscribe/<int:report_id>', methods=['POST'])
+def unsubscribe(report_id):
+    user_id = session.get('user_id')
+    subscription = Subscription.query.filter_by(user_id=user_id, report_id=report_id).first()
 
     if subscription:
-        flash("You are already subscribed to this report.", 'warning')
-        return redirect(url_for('subscribe_screen', report_id=report_id))
+        db.session.delete(subscription)
+        db.session.commit()
+        flash("Unsubscribed successfully.")
+    else:
+        flash("You're not subscribed to this report.")
 
-    # Add the subscription if not already subscribed
-    new_subscription = Subscription(user_id=session.get('user_id'), report_id=report_id)
-    db.session.add(new_subscription)
-    db.session.commit()
-
-    flash("You have successfully subscribed to this report.", 'success')
-    return redirect(url_for('subscribe_screen', report_id=report_id))
+    return redirect(url_for('subscribe_view', report_id=report_id))
 
 if __name__ == '__main__':
     app.run(debug=True)

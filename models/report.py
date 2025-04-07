@@ -1,3 +1,4 @@
+from datetime import datetime
 from db import db
 
 class Report(db.Model):
@@ -8,11 +9,17 @@ class Report(db.Model):
     latitude = db.Column(db.Float, nullable=True)
     category = db.Column(db.String(100), nullable=True)
 
-    # New: Foreign key to User table
+    # Foreign key to User table
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
-    # Optional relationship to access report.user directly
     user = db.relationship('User', backref='reports')
+
+    # 🔥 Auto-updated field
+    last_updated = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False
+    )
 
     def __repr__(self):
         return f'<Report {self.name}>'
@@ -25,5 +32,6 @@ class Report(db.Model):
             'longitude': self.longitude,
             'latitude': self.latitude,
             'category': self.category,
-            'user_id': self.user_id
+            'user_id': self.user_id,
+            'last_updated': self.last_updated.isoformat() if self.last_updated else None
         }
