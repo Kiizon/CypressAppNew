@@ -19,13 +19,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disable modification tra
 db.init_app(app)
 
 # Route to create the database tables
-@app.before_request
-def create_tables():
-    db.drop_all()
+@app.cli.command('init-db')
+def init_db():
+    """Create all tables and insert test data"""
     db.create_all()  # Create all tables defined by SQLAlchemy models
-    add_test_users()
-    insert_test_reports()
-
+    add_test_users()  # Add test users if needed
+    insert_test_reports()  # Insert test reports if needed
+    print("Database initialized and test data added.")
 
 def add_test_users():
     # List of test users with predefined usernames, emails, and passwords
@@ -151,9 +151,13 @@ def get_users():
 
 @app.route('/reports', methods=['GET'])
 def reports():
-    reports = Report.query.all()
+    user_type = session.get('user_type')
 
-    return render_template('view_reports.html', reports=reports)
+    user_id = session.get('user_id')
+    reportsAll = Report.query.all()  # Admin sees all reports
+    reports = Report.query.filter_by(user_id=user_id).all()  # User sees only their reports
+
+    return render_template('view_reports.html', user_type=user_type, reports=reports, reportsAll=reportsAll)
 
 @app.route('/map')
 def map():
@@ -174,6 +178,28 @@ def subscribe():
 @app.route('/logs')
 def logs():
     return render_template('placeholder.html', page_title='View Logs')
+
+@app.route('/edit_report/<int:report_id>', methods=['GET', 'POST'])
+def edit_report(report_id):
+    report = Report.query.get_or_404(report_id)
+
+    if session.get('user_type') == 0 or report.user_id == session.get('user_id'):
+        if request.method == 'POST':
+            # Update report details based on form input
+            report.name = request.form['name']
+            report.description = request.form['description']
+            report.category = request.form['category']
+            report.address = request.form['address']  # Saving the address (optional)
+            report.longitude = request.form['longitude']
+            report.latitude = request.form['latitude']
+
+            db.session.commit()
+            return redirect(url_for('reports'))
+
+        return render_template('edit_report.html', report=report)
+
+    else:
+        return redirect(url_for('reports'))
 
 if __name__ == '__main__':
     app.run(debug=True)
