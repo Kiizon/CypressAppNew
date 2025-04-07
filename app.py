@@ -162,7 +162,7 @@ def reports():
 
 @app.route('/map_reports')
 def rep():
-    return Report.index()  # Admin sees all reports
+    return report_methods.index()  # Admin sees all reports
 
 @app.route('/map')
 def map():
