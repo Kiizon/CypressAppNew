@@ -1,6 +1,6 @@
 import json
 import graphene
-from flask_graphql import GraphQLView
+from graphql_server.flask import GraphQLView
 import random
 from flask import Flask, render_template, session, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -116,7 +116,6 @@ def login():
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid username or password.', 'danger')
-    
 
     return render_template('login.html')
 
@@ -150,13 +149,6 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('login.html')  # If you support GET too
-
-@app.route('/guest_login', methods=['POST'])
-def guest_login():
-    # Automatically log the guest in (no username or password needed)
-    flash('You have signed in as a guest.', 'success')
-    return redirect(url_for('dashboard'))
-
 
 @app.route('/set_language/<lang>')
 def set_language(lang):
