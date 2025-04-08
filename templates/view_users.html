@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Users</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f5f5f5;
+      padding: 40px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .container {
+      display: inline-block;
+      text-align: left;
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+      width: 1200px;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    th {
+      background-color: #eee;
+    }
+
+    button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      background-color: #ff4d4d;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #e60000;
+    }
+
+    .add-btn {
+      background-color: #4CAF50;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .add-btn:hover {
+      background-color: #45a049;
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .yes-btn, .no-btn {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .yes-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .no-btn {
+      background-color: #f44336;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>View Users</h1>
+  <br>
+  <div class="container">
+
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>
+          <button onclick="confirmDelete('{{ user.id }}', '{{ user.username }}')">Delete</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" class="modal-overlay">
+    <div class="modal-content">
+      <p id="confirmText"></p>
+      <form id="deleteForm" method="POST">
+        <button type="submit" class="yes-btn">Yes</button>
+        <button type="button" class="no-btn" onclick="closeModal()">No</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function confirmDelete(userId, username) {
+      const modal = document.getElementById("confirmModal");
+      document.getElementById("confirmText").innerText = `Are you sure you want to delete ${username}?`;
+      document.getElementById("deleteForm").action = `/delete-user/${userId}`;
+      modal.style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("confirmModal").style.display = "none";
+    }
+  </script>
+</body>
+</html>

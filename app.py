@@ -28,6 +28,7 @@ def init_db():
     insert_test_reports()  # Insert test reports if needed
     print("Database initialized and test data added.")
 
+
 def add_test_users():
     # List of test users with predefined usernames, emails, and passwords
     test_users = [
@@ -60,12 +61,6 @@ def add_test_users():
         else:
             print(f"User {username} already exists.")
 
-@app.before_request
-def create_tables():
-    db.drop_all()
-    db.create_all()  # Create all tables defined by SQLAlchemy models
-    add_test_users()
-    insert_test_reports()
 
 def insert_test_reports():
     # Fetch all non-admin users
@@ -161,7 +156,6 @@ def login():
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id  # Store user_id in session
             session['username'] = user.username  # Store username in session
-            flash('Login successful!', 'success')
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid username or password.', 'danger')
@@ -176,7 +170,7 @@ def dashboard():
         return render_template('home_guestmode.html')
 
 
-    return render_template('home.html', username=session['username'])
+    return render_template('home.html', username=session['username'], usertype=session.get('user_type'))
 
 @app.route('/page1')
 
@@ -223,9 +217,6 @@ def rep():
 def map():
     return render_template('map.html')
 
-@app.route('/create_report')
-def create_report():
-    return render_template('placeholder.html', page_title='CR')
 
 @app.route('/settings')
 def settings():
@@ -272,7 +263,6 @@ def delete_report(report_id):
     if report:
         db.session.delete(report)  # Delete the report
         db.session.commit()  # Commit the change to the database
-        flash('Report deleted successfully.', 'success')  # Success message
     else:
         flash('Report not found.', 'danger')  # Handle case if the report doesn't exist
     return redirect(url_for('reports'))  # Redirect back to the list of reports
@@ -295,12 +285,11 @@ def subscribe_to_report(report_id):
     existing = Subscription.query.filter_by(user_id=user_id, report_id=report_id).first()
 
     if existing:
-        flash("You're already subscribed.")
+        print("You're already subscribed.")
     else:
         new_sub = Subscription(user_id=user_id, report_id=report_id)
         db.session.add(new_sub)
         db.session.commit()
-        flash("Subscribed successfully!")
 
     return redirect(url_for('subscribe_view', report_id=report_id))
 
@@ -312,11 +301,53 @@ def unsubscribe(report_id):
     if subscription:
         db.session.delete(subscription)
         db.session.commit()
-        flash("Unsubscribed successfully.")
+        print("Unsubscribed successfully.")
     else:
-        flash("You're not subscribed to this report.")
+        print("You're not subscribed to this report.")
 
     return redirect(url_for('subscribe_view', report_id=report_id))
+
+@app.route('/create_report', methods=['GET'])
+def create_report():
+    return render_template('new_report.html')
+
+@app.route('/create_report', methods=['POST'])
+def insert_report():
+    # Get the data from the form (not JSON, but form data)
+    name = request.form.get('report-title')
+    description = request.form.get('description')
+    category = request.form.get('category')
+    latitude = request.form.get('latitude')
+    longitude = request.form.get('longitude')
+    user_id = session.get('user_id')
+
+    # Ensure the required fields are provided
+    if not name or not description:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    # Create a new report object
+    new_report = Report(
+        name=name,
+        description=description,
+        category=category,
+        latitude=latitude,
+        longitude=longitude,
+        user_id=user_id
+    )
+
+    # Add the new report to the database
+    db.session.add(new_report)
+    db.session.commit()
+
+    # Redirect to the list of all reports (or you can redirect to a success page)
+    return redirect(url_for('dashboard'))
+
+@app.route('/view_users')
+def view_users():
+    usersAll = User.query.all()  # Admin sees all reports
+
+    return render_template('view_users.html', users=usersAll)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
