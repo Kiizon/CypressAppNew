@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <title>Add Map</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
       :root {
           --background:  #f2f2f2;
@@ -80,7 +81,7 @@
         top: -10px;
         left: 3%;
         width: 95%;
-        height: 40%;
+        height: 30%;
         background-color:  #f2f2f2;
         transition: 0.5s;
         transform-origin: center;
@@ -90,10 +91,10 @@
         content: "";
         transform-origin: center;
         position: absolute;
-        top: 80%;
+        top: 90%;
         left: 3%;
         width: 95%;
-        height: 40%;
+        height: 30%;
         background-color:  #f2f2f2;
         transition: 0.5s;
       }
@@ -107,7 +108,7 @@
       }
       #category-dropdown {
         width: 100%;
-        margin-top: 10px;
+        margin-top: 20px;
         padding: 10px; 
         font-size: 16px; 
         border-radius: 10px;
@@ -115,6 +116,7 @@
     </style>
   </head>
   <body>
+    {% include 'navbar.html' %}
     <h3 style="text-align: center; color: #0f3460">Cypress Map</h3>
 
     <div class="inline-container">
@@ -186,6 +188,7 @@
         const { Map } = await google.maps.importLibrary("maps");
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
         const { InfoWindow } = await google.maps.importLibrary("core");
+        const { Geocoder } = await google.maps.importLibrary("geocoding");
 
         // Initialize map
         map = new Map(document.getElementById("map"), {
@@ -251,7 +254,38 @@
 
             // Explicitly set the map for the marker
             marker.map = map;
+            
+            // get the address from the position
+            const geocoder = new Geocoder();
+            geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+              const address = results[0].formatted_address;
+
+              marker.addListener("click", () => {
+              const content = `
+                <div style="padding: 5x; max-width: 200px;">
+                  <h3 style="margin-top: 0;">${name}</h3>
+                  <p><strong>Category:</strong> ${category}</p>
+                  <p>${address}</p>
+                </div>
+              `;
+              
+              const infoWindow = new google.maps.InfoWindow({
+                content: content
+              });
+              
+              infoWindow.open(map, marker);
+              
+              google.maps.event.addListener(map, "click", function() {
+                infoWindow.close();
+              });
+            });
             reportMarkers.push(marker); 
+            });
+
+ 
+
+            
+           
           });
 
         } catch (error) {
@@ -400,11 +434,44 @@
           map: map
         });
 
-        reportMarkers.push(marker);
+             
+            // get the address from the position
+            const geocoder = new Geocoder();
+            geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+              const address = results[0].formatted_address;
+              //popups for the filtering systems
+              marker.addListener("click", () => {
+              const content = `
+                <div style="padding: 5px; max-width: 200px;">
+                  <h3 style="margin-top: 0;">${name}</h3>
+                  <p><strong>Category:</strong> ${category}</p>
+                  <p>${address}</p>
+                </div>
+              `;
+              
+              const infoWindow = new google.maps.InfoWindow({
+                content: content
+              });
+              
+              infoWindow.open(map, marker);
+              
+              google.maps.event.addListener(map, "click", function() {
+                infoWindow.close();
+              });
+            });
+            reportMarkers.push(marker); 
+            });
+
+ 
+
+            
+           
+          });
+
       });
-    });
 
 
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
