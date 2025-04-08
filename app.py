@@ -9,8 +9,8 @@ from models.subscription import Subscription
 from models.user import User
 from routes import user_methods
 from routes import report_methods
+from flask_graphql import GraphQLView
 
-from graphql_server.flask import GraphQLView
 import graphene
 
 app = Flask(__name__)
@@ -165,6 +165,12 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/guest_login', methods=['POST'])
+
+
+def guest_login():
+    flash('You have signed in as a guest.', 'success')
+    return redirect(url_for('dashboard'))
 
 @app.route('/dashboard')
 def dashboard():

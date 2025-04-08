@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "CypressAppNew",
+			"path": ".."
+		},
+		{
+			"name": "static",
+			"path": "../../../../Downloads/CypressAppNew-Login/static"
+		}
+	],
+	"settings": {}
+}
